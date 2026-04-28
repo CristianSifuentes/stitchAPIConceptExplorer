@@ -7,14 +7,16 @@ interface Props {
   level: string;
   accent: string;
   methods?: string[];
+  href?: string;
 }
 
-const { icon, title, summary, tag, level, accent, methods = [] } = Astro.props;
+const { icon, title, summary, tag, level, accent, methods = [], href = '#' } = Astro.props;
 const searchText = [title, summary, tag, level, ...methods].join(' ').toLowerCase();
 ---
 
-<article
+<a
   class="concept-card glass-panel"
+  href={href}
   style={`--accent:${accent}`}
   data-concept-card
   data-category={tag.toLowerCase()}
@@ -36,4 +38,4 @@ const searchText = [title, summary, tag, level, ...methods].join(' ').toLowerCas
     <span class="level">{level}</span>
     <span class="material-symbols-outlined arrow" aria-hidden="true">arrow_forward</span>
   </div>
-</article>
+</a>

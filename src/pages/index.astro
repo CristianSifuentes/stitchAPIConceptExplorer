@@ -97,7 +97,7 @@ const categories = ['All', ...new Set(concepts.map((concept) => concept.data.tag
       </div>
       <div class="concept-grid">
         {concepts.map((concept) => (
-          <ConceptCard {...concept.data} />
+          <ConceptCard {...concept.data} href={`/concepts/${concept.id}`} />
         ))}
       </div>
       <p class="concept-empty" hidden>No concepts match your search.</p>

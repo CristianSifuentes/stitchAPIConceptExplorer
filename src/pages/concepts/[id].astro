@@ -1,0 +1,201 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import NavBar from '@/components/NavBar.astro';
+import SiteFooter from '@/components/SiteFooter.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const concepts = await getCollection('concepts');
+
+  return concepts.map((concept) => ({
+    params: { id: concept.id },
+    props: { concept }
+  }));
+}
+
+const { concept } = Astro.props;
+const { Content } = await render(concept);
+const concepts = (await getCollection('concepts')).sort((a, b) => a.data.order - b.data.order);
+const relatedConcepts = concepts
+  .filter((entry) => entry.id !== concept.id)
+  .sort((a, b) => {
+    const tagMatchA = a.data.tag === concept.data.tag ? 0 : 1;
+    const tagMatchB = b.data.tag === concept.data.tag ? 0 : 1;
+    return tagMatchA - tagMatchB || a.data.order - b.data.order;
+  })
+  .slice(0, 3);
+
+const isAuthentication = concept.id === 'authentication';
+const howItWorks = isAuthentication
+  ? [
+      {
+        icon: 'key',
+        title: '1. Request',
+        text: 'The client sends credentials, such as a password, API key, session cookie, or token, to the API server.'
+      },
+      {
+        icon: 'policy',
+        title: '2. Verification',
+        text: 'The server validates those credentials against a trusted identity provider, database, or signing key.'
+      },
+      {
+        icon: 'check_circle',
+        title: '3. Session',
+        text: 'If the credentials are valid, the server establishes a session or issues a token for future requests.'
+      }
+    ]
+  : [
+      {
+        icon: concept.data.icon,
+        title: '1. Define',
+        text: `Clarify what ${concept.data.title.toLowerCase()} means in the API contract and where clients encounter it.`
+      },
+      {
+        icon: 'integration_instructions',
+        title: '2. Apply',
+        text: 'Use the concept consistently across endpoints, documentation, request handling, and client behavior.'
+      },
+      {
+        icon: 'monitoring',
+        title: '3. Operate',
+        text: 'Measure the behavior in production and refine the design when usage patterns or risks become visible.'
+      }
+    ];
+
+const commonTypes = isAuthentication
+  ? [
+      {
+        title: 'Basic Auth',
+        text: 'Credentials are Base64 encoded and sent in the Authorization header. Only use it over HTTPS.'
+      },
+      {
+        title: 'API Keys',
+        text: 'A unique secret string passed with requests. Simple to implement, but limited without scopes and rotation.'
+      },
+      {
+        title: 'OAuth 2.0',
+        text: 'A token-based standard that lets users grant access without sharing passwords.',
+        recommended: true
+      }
+    ]
+  : [
+      {
+        title: 'Contract',
+        text: `Document how ${concept.data.title.toLowerCase()} appears in requests, responses, errors, and examples.`
+      },
+      {
+        title: 'Client Behavior',
+        text: 'Explain what clients should do when this concept affects retries, caching, permissions, or user feedback.'
+      },
+      {
+        title: 'Operational Guardrails',
+        text: 'Add monitoring, limits, and tests around the parts of the API where this concept matters most.',
+        recommended: concept.data.level === 'Advanced'
+      }
+    ];
+
+const requestMethod = concept.data.methods?.[0] ?? 'GET';
+const codeExample = isAuthentication
+  ? `${requestMethod} /api/v1/user/profile HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c...
+Accept: application/json`
+  : `${requestMethod} /api/v1/${concept.id} HTTP/1.1
+Host: api.example.com
+Accept: application/json
+X-Request-ID: req_7Yx9b2`;
+---
+
+<BaseLayout title={`${concept.data.title} | API Concepts`}>
+  <NavBar />
+  <main class="concept-detail container">
+    <article class="detail-main">
+      <header class="detail-header">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/#concepts">Concepts</a>
+          <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+          <span>{concept.data.title}</span>
+        </nav>
+        <div class="detail-title-row">
+          <span class="detail-icon material-symbols-outlined" style={`--accent:${concept.data.accent}`} aria-hidden="true">
+            {concept.data.icon}
+          </span>
+          <div>
+            <p class="eyebrow">{concept.data.tag} / {concept.data.level}</p>
+            <h1>{concept.data.title}</h1>
+          </div>
+        </div>
+        <p class="detail-lede">{concept.data.summary}</p>
+        <div class="detail-body">
+          <Content />
+        </div>
+      </header>
+
+      <section class="detail-section">
+        <h2>How It Works</h2>
+        <div class="detail-steps">
+          {howItWorks.map((step) => (
+            <div class="detail-step glass-panel">
+              <span class="material-symbols-outlined" aria-hidden="true">{step.icon}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h2>Implementation Example</h2>
+        <p>
+          {isAuthentication
+            ? 'Authentication is commonly handled through HTTP headers. The Authorization header is the standard place to pass bearer tokens or credentials.'
+            : `A clear ${concept.data.title.toLowerCase()} contract should show clients the request shape, important headers, and expected behavior.`}
+        </p>
+        <div class="code-panel">
+          <div class="code-panel-header">
+            <span>HTTP Request</span>
+            <strong>{requestMethod}</strong>
+          </div>
+          <pre><code>{codeExample}</code></pre>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h2>{isAuthentication ? 'Common Types' : 'Design Notes'}</h2>
+        <div class="detail-notes">
+          {commonTypes.map((item) => (
+            <div class:list={['detail-note', 'glass-panel', { recommended: item.recommended }]}>
+              <h3>
+                {item.title}
+                {item.recommended && <span>Recommended</span>}
+              </h3>
+              <p>{item.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </article>
+
+    <aside class="detail-sidebar" aria-label="Related concepts">
+      <div class="sidebar-card glass-panel">
+        <h2>Related Concepts</h2>
+        <ul>
+          {relatedConcepts.map((related) => (
+            <li>
+              <a href={`/concepts/${related.id}`}>
+                <span class="material-symbols-outlined" aria-hidden="true">{related.data.icon}</span>
+                <span>
+                  <strong>{related.data.title}</strong>
+                  <small>{related.data.summary}</small>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </aside>
+  </main>
+  <SiteFooter />
+</BaseLayout>

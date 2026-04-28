@@ -4,50 +4,92 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import NavBar from '@/components/NavBar.astro';
 import ConceptCard from '@/components/ConceptCard.astro';
 import DeferredProfile from '@/components/DeferredProfile.astro';
+import SiteFooter from '@/components/SiteFooter.astro';
 
 const concepts = (await getCollection('concepts')).sort((a, b) => a.data.order - b.data.order);
+const highlighted = concepts.slice(0, 4);
 ---
 
-<BaseLayout title="Advanced Astro Concepts | API Explorer">
+<BaseLayout title="20 API Concepts for System Design">
   <NavBar />
-  <main class="container" style="padding:3rem 0 4rem; display:grid; gap:2rem;">
-    <section style="text-align:center;display:grid;gap:1.2rem;">
-      <h1 style="font-size:clamp(2rem,5vw,4rem); line-height:1.1; margin:0;">Master Astro Architecture & API Design</h1>
-      <p style="max-width:780px;margin:0 auto;color:var(--muted);font-size:1.2rem;line-height:1.5;">Server islands, hybrid rendering, content collections, actions, middleware, and extensibility — wrapped in a premium UX/UI layout based on modern CSS Grid + Flex patterns.</p>
-      <img src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=1600&q=80" alt="network visualization" style="width:min(920px,100%);margin:1rem auto 0;border-radius:18px;border:1px solid var(--line);padding:.45rem;" />
-    </section>
-
-    <section id="architecture" style="display:grid;grid-template-columns:1.3fr .9fr;gap:1rem;align-items:start;">
-      <div class="glass" style="border-radius:16px;padding:1.2rem;">
-        <h2 style="margin:0;">Advanced Architecture</h2>
-        <ul style="margin:.7rem 0 0;color:var(--muted);line-height:1.8;padding-left:1rem;">
-          <li><strong>Hybrid Rendering:</strong> this site is static-first with a dynamic SSR route at <code>/live</code>.</li>
-          <li><strong>Server Islands:</strong> profile card below renders deferred via server.</li>
-          <li><strong>View Transitions-ready:</strong> structure prepared for smooth route changes.</li>
-          <li><strong>Middleware:</strong> custom headers demonstrate centralized request policy.</li>
-        </ul>
+  <main>
+    <section class="hero-section container">
+      <div class="hero-copy">
+        <p class="eyebrow">System design foundations</p>
+        <h1>Master the foundation: 20 essential API concepts</h1>
+        <p class="hero-lede">
+          A focused guide to the building blocks behind reliable APIs: protocol semantics,
+          security boundaries, performance controls, and production operations.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#concepts">
+            <span class="material-symbols-outlined" aria-hidden="true">grid_view</span>
+            Explore concepts
+          </a>
+          <a class="button secondary" href="#resources">
+            <span class="material-symbols-outlined" aria-hidden="true">terminal</span>
+            View patterns
+          </a>
+        </div>
       </div>
-      <DeferredProfile server:defer />
+      <figure class="hero-visual glass-panel">
+        <img
+          src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1600&q=82"
+          alt="Server racks and network lights representing API infrastructure"
+        />
+        <figcaption>
+          <span>API surface</span>
+          <strong>20 concepts</strong>
+        </figcaption>
+      </figure>
     </section>
 
-    <section id="newsletter" class="glass" style="border-radius:16px;padding:1rem 1.2rem;">
-      <h2 style="margin:0 0 .7rem;">Astro Actions Demo</h2>
-      <form action="/actions/subscribe" method="POST" style="display:flex;gap:.6rem;flex-wrap:wrap;">
-        <input name="email" type="email" required placeholder="you@example.com" style="flex:1;min-width:240px;padding:.72rem;border-radius:.65rem;border:1px solid var(--line);" />
-        <button style="padding:.72rem 1rem;border:none;background:#0f172a;color:white;border-radius:.65rem;">Subscribe</button>
-      </form>
-    </section>
-
-    <section id="concepts">
-      <div style="display:flex;justify-content:space-between;align-items:end;gap:1rem; margin-bottom:1rem;">
-        <h2 style="margin:0;font-size:2rem;">Concept Explorer</h2>
-        <small style="color:var(--muted);">Type-safe content powered by Astro Content Collections</small>
+    <section id="resources" class="resource-band">
+      <div class="container resource-grid">
+        <div>
+          <p class="eyebrow">From design to production</p>
+          <h2>API thinking that scales beyond a single endpoint</h2>
+        </div>
+        <div class="resource-list">
+          {highlighted.map((concept) => (
+            <a href="#concepts" style={`--accent:${concept.data.accent}`}>
+              <span class="material-symbols-outlined" aria-hidden="true">{concept.data.icon}</span>
+              <span>{concept.data.title}</span>
+            </a>
+          ))}
+        </div>
+        <DeferredProfile server:defer />
       </div>
-      <div class="grid-cards">
+    </section>
+
+    <section id="concepts" class="concept-section container">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Concept explorer</p>
+          <h2>Build a sharper API vocabulary</h2>
+        </div>
+        <p>Each card is a concise system-design primitive with a practical category and maturity level.</p>
+      </div>
+      <div class="concept-grid">
         {concepts.map((concept) => (
           <ConceptCard {...concept.data} />
         ))}
       </div>
     </section>
+
+    <section id="newsletter" class="newsletter-section container glass-panel">
+      <div>
+        <p class="eyebrow">Type-safe action demo</p>
+        <h2>Get the API design briefing</h2>
+      </div>
+      <form action="/actions/subscribe" method="POST">
+        <input name="email" type="email" required placeholder="you@example.com" aria-label="Email address" />
+        <button type="submit">
+          <span class="material-symbols-outlined" aria-hidden="true">send</span>
+          Subscribe
+        </button>
+      </form>
+    </section>
   </main>
+  <SiteFooter />
 </BaseLayout>

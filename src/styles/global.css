@@ -369,12 +369,19 @@ h2 {
   margin-top: 0.35rem;
 }
 
+.concept-controls {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.35rem;
+}
+
 .concept-search {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  width: min(680px, 100%);
-  margin: 0 auto 1.35rem;
+  width: 100%;
   border-radius: 8px;
   padding: 0.78rem 0.95rem;
   transition: border-color 180ms ease, box-shadow 180ms ease;
@@ -400,6 +407,38 @@ h2 {
 
 .concept-search input::placeholder {
   color: var(--subtle);
+}
+
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.category-filter {
+  min-height: 38px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--muted);
+  padding: 0.48rem 0.82rem;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.category-filter:hover {
+  border-color: rgba(27, 27, 27, 0.26);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text);
+}
+
+.category-filter.active {
+  border-color: #bae6fd;
+  background: #e0f2fe;
+  color: var(--text);
 }
 
 .concept-grid {
@@ -634,6 +673,14 @@ h2 {
 
   .section-heading {
     display: grid;
+  }
+
+  .concept-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .category-filters {
+    justify-content: flex-start;
   }
 
   .newsletter-section form {

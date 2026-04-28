@@ -13,7 +13,13 @@ const { icon, title, summary, tag, level, accent, methods = [] } = Astro.props;
 const searchText = [title, summary, tag, level, ...methods].join(' ').toLowerCase();
 ---
 
-<article class="concept-card glass-panel" style={`--accent:${accent}`} data-concept-card data-search={searchText}>
+<article
+  class="concept-card glass-panel"
+  style={`--accent:${accent}`}
+  data-concept-card
+  data-category={tag.toLowerCase()}
+  data-search={searchText}
+>
   <div class="card-accent" aria-hidden="true"></div>
   <div class="card-main">
     <span class="material-symbols-outlined card-icon" aria-hidden="true">{icon}</span>

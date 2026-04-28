@@ -1,0 +1,8 @@
+---
+const now = new Date().toISOString();
+await new Promise((resolve) => setTimeout(resolve, 900));
+---
+<div class="glass" style="border-radius:14px;padding:1rem;">
+  <p style="margin:0 0 .5rem 0; font-weight:700;">Personalized Server Island</p>
+  <p style="margin:0;color:var(--muted)">Rendered at <code>{now}</code> without blocking the static shell.</p>
+</div>

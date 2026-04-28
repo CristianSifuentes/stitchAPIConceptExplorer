@@ -70,11 +70,22 @@ const highlighted = concepts.slice(0, 4);
         </div>
         <p>Each card is a concise system-design primitive with a practical category and maturity level.</p>
       </div>
+      <div class="concept-search glass-panel">
+        <span class="material-symbols-outlined" aria-hidden="true">search</span>
+        <input
+          id="concept-search"
+          type="search"
+          placeholder="Search API concepts..."
+          aria-label="Search API concepts"
+          autocomplete="off"
+        />
+      </div>
       <div class="concept-grid">
         {concepts.map((concept) => (
           <ConceptCard {...concept.data} />
         ))}
       </div>
+      <p class="concept-empty" hidden>No concepts match your search.</p>
     </section>
 
     <section id="newsletter" class="newsletter-section container glass-panel">
@@ -92,4 +103,24 @@ const highlighted = concepts.slice(0, 4);
     </section>
   </main>
   <SiteFooter />
+  <script>
+    const searchInput = document.querySelector<HTMLInputElement>('#concept-search');
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-concept-card]'));
+    const emptyState = document.querySelector<HTMLElement>('.concept-empty');
+
+    searchInput?.addEventListener('input', () => {
+      const query = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const isVisible = !query || card.dataset.search?.includes(query);
+        card.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
+      });
+
+      if (emptyState) {
+        emptyState.hidden = visibleCount > 0;
+      }
+    });
+  </script>
 </BaseLayout>
